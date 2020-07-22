@@ -1,0 +1,4 @@
+.vscode
+.webassets-cache
+__pycache__/
+instance/
