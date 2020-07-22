@@ -2,16 +2,19 @@
 # Imports
 #----------------------------------------------------------------------------#
 
-import json
-import dateutil.parser
 import babel
+import dateutil.parser
+import logging
+import json
+
+from dataclasses import dataclass
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
-import logging
-from logging import Formatter, FileHandler
 from flask_wtf import Form
 from forms import *
+from logging import Formatter, FileHandler
+
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -27,7 +30,17 @@ db = SQLAlchemy(app)
 # Models.
 #----------------------------------------------------------------------------#
 
+@dataclass
 class Venue(db.Model):
+    id: int
+    name: str = None
+    city: str = None
+    state: str = None
+    address: str = None
+    phone: str = None
+    image_link: str = None
+    facebook_link: str = None
+
     __tablename__ = 'Venue'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -41,7 +54,17 @@ class Venue(db.Model):
 
     # TODO: implement any missing fields, as a database migration using Flask-Migrate
 
+@dataclass
 class Artist(db.Model):
+    id: int
+    name: str = None
+    city: str = None
+    state: str = None
+    phone: str = None
+    genres: str = None
+    image_link: str = None
+    facebook_link: str = None
+    
     __tablename__ = 'Artist'
 
     id = db.Column(db.Integer, primary_key=True)
