@@ -3,4 +3,5 @@ flask-moment
 flask-sqlalchemy
 flask-migrate
 flask-wtf
+psycopg2
 python-dateutil==2.6.0
