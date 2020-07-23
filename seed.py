@@ -121,7 +121,6 @@ def seed():
             db.session.add(artist)
 
         for show_row in shows:
-            print(exc_info())
             show = Show(**show_row)
             db.session.add(show)
 
@@ -132,6 +131,7 @@ def seed():
         db.session.commit()
         print('Data seeded successfully!')
     except:
+        print(exc_info())
         db.session.rollback()
         print('There was an error seeding data!')
     finally:
