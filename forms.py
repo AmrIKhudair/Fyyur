@@ -1,5 +1,5 @@
 from datetime import datetime
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms.fields import *
 from wtforms.validators import *
 
@@ -79,26 +79,26 @@ STATES = [
     ('WY', 'WY'),
 ]
 
-class ShowForm(Form):
+class ShowForm(FlaskForm):
     artist_id = IntegerField('artist_id', validators=[DataRequired()])
     venue_id = IntegerField('venue_id', validators=[DataRequired()])
     start_time = DateTimeField('start_time', validators=[DataRequired()], default= datetime.today())
 
-class VenueForm(Form):
+class VenueForm(FlaskForm):
     name = StringField('name', validators=[DataRequired()])
     city = StringField('city', validators=[DataRequired()])
     state = SelectField('state', validators=[DataRequired()], choices=STATES)
     address = StringField('address', validators=[DataRequired()])
-    phone = StringField('phone', validators=[Regexp('^\d{3}-\d{3}-\d{4}$')])
-    image_link = StringField('image_link', validators=[URL()])
+    phone = StringField('phone', validators=[Optional(), Regexp('^\d{3}-\d{3}-\d{4}$')])
+    image_link = StringField('image_link', validators=[Optional(), URL()])
     genres = SelectMultipleField('genres', validators=[DataRequired()], choices=GENRES)
-    facebook_link = StringField('facebook_link', validators=[URL()])
+    facebook_link = StringField('facebook_link', validators=[Optional(), URL()])
 
-class ArtistForm(Form):
+class ArtistForm(FlaskForm):
     name = StringField('name', validators=[DataRequired()])
     city = StringField('city', validators=[DataRequired()])
     state = SelectField('state', validators=[DataRequired()], choices=STATES)
-    phone = StringField('phone', validators=[Regexp('^\d{3}-\d{3}-\d{4}$')])
-    image_link = StringField('image_link', validators=[URL()])
+    phone = StringField('phone', validators=[Optional(), Regexp('^\d{3}-\d{3}-\d{4}$')])
+    image_link = StringField('image_link', validators=[Optional(), URL()])
     genres = SelectMultipleField('genres', validators=[DataRequired()], choices=GENRES)
-    facebook_link = StringField('facebook_link', validators=[URL()])
+    facebook_link = StringField('facebook_link', validators=[Optional(), URL()])

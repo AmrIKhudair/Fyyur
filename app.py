@@ -9,14 +9,14 @@ import json
 
 from datetime import datetime
 from helpers import Fillable, csv
-from flask import Flask, Response, request, abort, flash, redirect, render_template, url_for
+from flask import Flask, Response, request, session, abort, flash, redirect, render_template, url_for
 from flask_migrate import Migrate
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
-from flask_wtf import Form
 from forms import *
 from logging import Formatter, FileHandler
 from sys import exc_info
+from werkzeug.datastructures import MultiDict
 
 #----------------------------------------------------------------------------#
 # App Config.
@@ -284,12 +284,23 @@ def show_venue(venue_id):
 
 @app.route('/venues/create', methods=['GET'])
 def create_venue_form():
-    form = VenueForm()
+    formdata = session.pop('formdata', None)
+    if formdata:
+        form = VenueForm(MultiDict(formdata))
+        form.validate()
+    else: form = VenueForm()
     return render_template('forms/new_venue.html', form=form)
 
 
 @app.route('/venues/create', methods=['POST'])
 def create_venue_submission():
+    form = VenueForm()
+    if not form.validate_on_submit():
+        if ('csrf_token' in form.errors):
+            flash('Form expired! Please try submitting again.')
+        session['formdata'] = request.form
+        return redirect(url_for('create_venue_form'))
+
     venue = Venue()
     venue.fill(_except=['id', 'genres'], **request.form)
     venue.genres = ','.join(request.form.getlist('genres'))
@@ -367,7 +378,14 @@ def show_artist(artist_id):
 def edit_artist(artist_id):
     artist = Artist.query.get(artist_id)
     if not artist: abort(404)
-    form = ArtistForm(**artist.to_form_dict())
+
+    formdata = session.pop('formdata', None)
+
+    if formdata:
+        form = ArtistForm(MultiDict(formdata))
+        form.validate()
+    else: form = ArtistForm(**artist.to_form_dict())
+
     return render_template('forms/edit_artist.html', form=form, artist=artist)
 
 
@@ -375,6 +393,13 @@ def edit_artist(artist_id):
 def edit_artist_submission(artist_id):
     artist = Artist.query.get(artist_id)
     if not artist: abort(404)
+
+    form = ArtistForm()
+    if not form.validate_on_submit():
+        if ('csrf_token' in form.errors):
+            flash('Form expired! Please try submitting again.')
+        session['formdata'] = request.form
+        return redirect(url_for('edit_artist', artist_id=artist_id))
 
     try:
         artist.fill(_except=['id', 'genres'], **request.form)
@@ -395,7 +420,14 @@ def edit_artist_submission(artist_id):
 def edit_venue(venue_id):
     venue = Venue.query.get(venue_id)
     if not venue: abort(404)
-    form = VenueForm(**venue.to_form_dict())
+    
+    formdata = session.pop('formdata', None)
+
+    if formdata:
+        form = VenueForm(MultiDict(formdata))
+        form.validate()
+    else: form = VenueForm(**venue.to_form_dict())
+
     return render_template('forms/edit_venue.html', form=form, venue=venue)
 
 
@@ -403,6 +435,13 @@ def edit_venue(venue_id):
 def edit_venue_submission(venue_id):
     venue = Venue.query.get(venue_id)
     if not venue: abort(404)
+
+    form = VenueForm()
+    if not form.validate_on_submit():
+        if ('csrf_token' in form.errors):
+            flash('Form expired! Please try submitting again.')
+        session['formdata'] = request.form
+        return redirect(url_for('edit_venue', venue_id=venue_id))
 
     try:
         venue.fill(_except=['id', 'genres'], **request.form)
@@ -424,12 +463,24 @@ def edit_venue_submission(venue_id):
 
 @app.route('/artists/create', methods=['GET'])
 def create_artist_form():
-    form = ArtistForm()
+    formdata = session.pop('formdata', None)
+    if formdata:
+        form = ArtistForm(MultiDict(formdata))
+        form.validate()
+    else: form = ArtistForm()
     return render_template('forms/new_artist.html', form=form)
 
 
 @app.route('/artists/create', methods=['POST'])
 def create_artist_submission():
+    form = ArtistForm()
+    if not form.validate_on_submit():
+        print(form.errors)
+        if ('csrf_token' in form.errors):
+            flash('Form expired! Please try submitting again.')
+        session['formdata'] = request.form
+        return redirect(url_for('create_artist_form'))
+
     artist = Artist()
     artist.fill(_except=['id', 'genres'], **request.form)
     artist.genres = ','.join(request.form.getlist('genres'))
@@ -462,13 +513,22 @@ def shows():
 
 @app.route('/shows/create')
 def create_shows():
-    # renders form. do not touch.
-    form = ShowForm()
+    formdata = session.pop('formdata', None)
+    if formdata:
+        form = ShowForm(MultiDict(formdata))
+        form.validate()
+    else: form = ShowForm()
     return render_template('forms/new_show.html', form=form)
-
 
 @app.route('/shows/create', methods=['POST'])
 def create_show_submission():
+    form = ShowForm()
+    if not form.validate_on_submit():
+        if ('csrf_token' in form.errors):
+            flash('Form expired! Please try submitting again.')
+        session['formdata'] = request.form
+        return redirect(url_for('create_shows'))
+
     show = Show()
     show.fill(_except=['id'], **request.form)
 
