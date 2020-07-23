@@ -1,4 +1,4 @@
-from app import db, Artist, Show, Venue
+from app import *
 
 artists = [
     {
@@ -121,6 +121,7 @@ def seed():
             db.session.add(artist)
 
         for show_row in shows:
+            print(exc_info())
             show = Show(**show_row)
             db.session.add(show)
 
